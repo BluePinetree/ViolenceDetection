@@ -5,7 +5,6 @@ import cv2
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
-
 import tensorflow as tf
 
 from tqdm import tqdm
@@ -20,7 +19,7 @@ class VideoDataset:
                  batch=8,
                  random_seed=2019,
                  size=(224,224,3),
-                 n_frames = 41):
+                 n_frames = 30):
 
         self.batch = batch
         self.random_seed = random_seed
@@ -35,8 +34,8 @@ class VideoDataset:
         # 파일 읽어오기
         trn_ids, val_ids, total_label = self._video_dataset(files, self.data_dir)
 
-        trn_generator = DataGenerator(data_IDs=trn_ids, labels=total_label, batch_size=self.batch, shuffle=True)
-        val_generator = DataGenerator(data_IDs=val_ids, labels=total_label, batch_size=self.batch, shuffle=False)
+        trn_generator = DataGenerator(data_IDs=trn_ids, labels=total_label, batch_size=self.batch, dim=self.size, shuffle=True)
+        val_generator = DataGenerator(data_IDs=val_ids, labels=total_label, batch_size=self.batch, dim=self.size, shuffle=False)
 
         return trn_generator, val_generator
 
@@ -76,7 +75,7 @@ class VideoDataset:
     def _preprocessed_dir(self):
         return os.path.join(self.data_dir, 'processed')
 
-class HockyFightDataset(VideoDataset):
+class HockeyFightDataset(VideoDataset):
 
     def __init__(self,
                  data_dir='./data/HockeyFights',
