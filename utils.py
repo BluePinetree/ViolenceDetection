@@ -3,6 +3,7 @@ import numpy as np
 from tensorflow import keras
 import h5py
 import os
+import cv2
 
 # data generator
 class DataGenerator(keras.utils.Sequence):
@@ -47,14 +48,21 @@ class DataGenerator(keras.utils.Sequence):
     def __data_generation(self, data_IDs_temp):
         # X : (n_samples, *dim, n_frames)
         # Initialization
-        X = np.empty((self.batch_size, self.n_frames, *self.dim))
+        X = np.empty((self.batch_size, self.n_frames, *self.dim), dtype=np.float32)
         y = np.empty((self.batch_size), dtype=int)
 
         # Generate data
         for i, ID in enumerate(data_IDs_temp):
             # Store sample
             h5_file = h5py.File(os.path.join(self.data_dir, f'./processed/{ID}.h5'), 'r')
-            X[i,] = h5_file['data']
+            # 전처리
+            if (h5_file['data'].shape[1] > self.dim[0]) and (h5_file['data'].shape[2] > self.dim[1]):
+                data = random_cropping(h5_file['data'], self.dim[:2])
+            else:
+                data = np.asarray([cv2.resize(im, dsize=self.dim[:2], interpolation=cv2.INTER_CUBIC)
+                                   for im in h5_file['data']])
+
+            X[i,] = data / 255.
             h5_file.close()
 
             # Store class
@@ -67,7 +75,9 @@ def random_cropping(data, crop_size=(224, 224)):
     height, width = data.shape[1], data.shape[2]
     he_idx = int(np.random.uniform(0, height - crop_size[0] + 1, size=()))
     wi_idx = int(np.random.uniform(0, width - crop_size[0] + 1, size=()))
-    print(he_idx, wi_idx)
     data = data[:, he_idx:he_idx + crop_size[0], wi_idx:wi_idx + crop_size[1]]
 
     return data
+
+def get_steps_hockey(num_data, batch):
+    return num_data//batch + 1
