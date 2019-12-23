@@ -17,7 +17,7 @@ def main():
     if not os.path.exists(output_path): os.mkdir(output_path)
 
     # data url
-    url = 'https://www.youtube.com/watch?v=TMrkX_uJuG8'
+    url = 'https://www.youtube.com/watch?v=0dYG1tdGjQU'
 
     # load pretrained model
     inputs = Input([None, *input_shape])
@@ -40,7 +40,7 @@ def main():
                   int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
     # video writer
     forcc = cv2.VideoWriter_fourcc(*'DIVX')
-    out = cv2.VideoWriter(os.path.join(output_path, 'test.avi'), forcc, 35., frame_size)
+    out = cv2.VideoWriter(os.path.join(output_path, 'test3.avi'), forcc, 30., frame_size)
 
     prevTime, result, vl_prob = 0, 0, 0
     input_num = 30
